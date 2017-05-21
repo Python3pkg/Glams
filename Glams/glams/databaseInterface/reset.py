@@ -1,7 +1,7 @@
 # encoding: utf-8
 import os
 if __name__=='__main__':
-    from connect import db, importconfig
+    from .connect import db, importconfig
     rootDirectory=os.path.abspath('../..')
     
 else:

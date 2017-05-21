@@ -5,7 +5,7 @@ from glams.databaseInterface.connect import db, db2
 from glams.checkpassword.checkpassword import *
 import time
 from random import *
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import string, hashlib
 chars = string.ascii_letters + string.digits
 
@@ -13,7 +13,7 @@ class Ajax:
     @cherrypy.expose
     def changepassword(self, fields):
         time.sleep(1)
-        d={urllib2.unquote(i.split('=')[0]):urllib2.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
+        d={urllib.parse.unquote(i.split('=')[0]):urllib.parse.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
         oldpassword=d['oldpassword']
         newpassword1=d['newpassword1']
         newpassword2=d['newpassword2']
@@ -52,7 +52,7 @@ class Ajax:
         user=checkPassword()
         if not user:
             return """<meta http-equiv="refresh" content="0;url=/home/login" />"""
-        d={urllib2.unquote(i.split('=')[0]):urllib2.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
+        d={urllib.parse.unquote(i.split('=')[0]):urllib.parse.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
         newemail1=d['newemail1']
         newemail2=d['newemail2']
         password=d['password']

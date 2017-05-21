@@ -3,12 +3,12 @@
 import os, cherrypy
 os.chdir(os.path.split(os.path.realpath(__file__))[0])
 try:
-    from glams.website.database.database import Database #this will fail if database is not set up correctly
-    from glams.website.info.info import Info
-    from glams.website.home.home import Home
-    from glams.website.experimentlog.experimentlog import Experimentlog
-    from glams.website.admin.admin import Admin
-    from glams.website.cal.cal import Calendar
+    from .glams.website.database.database import Database #this will fail if database is not set up correctly
+    from .glams.website.info.info import Info
+    from .glams.website.home.home import Home
+    from .glams.website.experimentlog.experimentlog import Experimentlog
+    from .glams.website.admin.admin import Admin
+    from .glams.website.cal.cal import Calendar
     webpage="""<!DOCTYPE HTML>
     <html>
     <head>
@@ -65,7 +65,7 @@ try:
             return Root.webpage
             
 except IOError:
-    from setup_glams import setup_glams, Ajax
+    from .setup_glams import setup_glams, Ajax
     webpage=setup_glams()
     class Root:
         webpage=webpage

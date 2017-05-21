@@ -5,7 +5,7 @@ from glams.databaseInterface.connect import db, db2
 from glams.glamsTemplate import glamsTemplate
 from glams.website.database.classes import Mouse, Cage, date2str, getAge
 from glams.website.database.forms import getMouseForm, getCageForm, getInnerCageForm, getGeneticFilterForm, getStrainList, getLabMemberList, getResidentsFilterForm
-import urllib, datetime
+import urllib.request, urllib.parse, urllib.error, datetime
 from lxml import etree
 from lxml.builder import E
 from copy import deepcopy
@@ -24,7 +24,7 @@ def unquote_htmlform(text):
            output=[['cagename', 'ck9'], ['active', 'Yes'], ['date_activated', '2014-02-05'], ['date_inactivated', ''], ['location', 'Conventional Rack 2'], ['expectingpl', 'Yes'], ['caretaker', 'Kyle'], ['cagegroup', 'C57BL/6 WT'], ['notes', '3 F were imported.\r\na=b+c\r\nThis might be difficult.']]
             '''
     #output=[[urllib.unquote_plus(tmp2).replace(r'\xa0',' ') for tmp2 in tmp.split('=')] for tmp in text.split('&')]
-    output=[[''.join([i for i in urllib.unquote_plus(tmp2) if ord(i) < 127]) for tmp2 in tmp.split('=')] for tmp in text.split('&')] #this strips all non ascii characters out, but might slow down everything too much
+    output=[[''.join([i for i in urllib.parse.unquote_plus(tmp2) if ord(i) < 127]) for tmp2 in tmp.split('=')] for tmp in text.split('&')] #this strips all non ascii characters out, but might slow down everything too much
     return output
     
     
@@ -200,11 +200,11 @@ def makequery(viewtype,c,sortby):
                      'ageatexperiment':"IF(m.life_status='euthanized' AND experiments.date>m.DOD,DATEDIFF(m.DOD,m.DOB),DATEDIFF(experiments.date,m.DOB)) >= %(ageatexperiment0)s AND IF(m.life_status='euthanized' AND experiments.date>m.DOD,DATEDIFF(m.DOD,m.DOB),DATEDIFF(experiments.date,m.DOB)) <= %(ageatexperiment1)s"
                  }
     d=dict() #d is a dictionary of arguments that will be the second argument in the mysql query, in order to prevent a mysql injection
-    for k in WhereAlias.keys():
-        if k in c.keys() and c[k] is not None:
+    for k in list(WhereAlias.keys()):
+        if k in list(c.keys()) and c[k] is not None:
             if k in set(['mousename','cagename2','cagename','cagenotes','mouse_notes', 'cagegroup','reserve_description']):
                 c[k][0][1]='%'+c[k][0][1]+'%' #this makes the filter in mysql have wildcards before and after
-            if (viewtype=='mouse' and k in MouseAlias.keys()) or (viewtype=='cage' and k in CageAlias.keys()):
+            if (viewtype=='mouse' and k in list(MouseAlias.keys())) or (viewtype=='cage' and k in list(CageAlias.keys())):
                 if k=='genetics':
                     genetics=[ [c['genetics'][i][1], c['genetics'][i+1][1], c['genetics'][i+2][1]] for i in range(0,len(c['genetics']),3) ]
                     genetics[0][0]=''
@@ -232,7 +232,7 @@ def makequery(viewtype,c,sortby):
         mousekeys=set(c.keys()).intersection(set(MouseAlias.keys()))
         for key in mousekeys:
             q.append(MouseAlias[key])
-            if key in WhereAlias.keys():
+            if key in list(WhereAlias.keys()):
                 w.append(c[key])
         w=[item for item in w if item is not None]
         w.append("(housing.currentcage=1 OR (housing.currentcage=0 AND housing.start_date= (SELECT max(h.start_date) FROM housing AS h WHERE h.mouse_id=m.id) AND housing.end_date>=housing.start_date) OR housing.currentcage IS NULL)")
@@ -817,8 +817,8 @@ class Ajax:
         del d['oldcage_id']
         del d['oldmother_id']
         del d['oldDOB']
-        columns=', '.join(d.keys())
-        parameters = ', '.join(['%({0})s'.format(k) for k in d.keys()])
+        columns=', '.join(list(d.keys()))
+        parameters = ', '.join(['%({0})s'.format(k) for k in list(d.keys())])
         query = 'INSERT INTO litters ({0}) VALUES ({1})'.format(columns, parameters)
         db.execute(query,d)
         return 'Successfully edited pup litter'
@@ -848,8 +848,8 @@ class Ajax:
             return 'The mother you selected does not exist'
         del d['mother']
         d['mother_id']=mother_id[0][0]
-        columns=', '.join(d.keys())
-        parameters = ', '.join(['%({0})s'.format(k) for k in d.keys()])
+        columns=', '.join(list(d.keys()))
+        parameters = ', '.join(['%({0})s'.format(k) for k in list(d.keys())])
         query = 'INSERT INTO litters ({0}) VALUES ({1})'.format(columns, parameters)
         db.execute(query,d)
         return 'Successfully added pup litter to {}'.format(cagename)

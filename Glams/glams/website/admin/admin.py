@@ -11,7 +11,7 @@ from glams.checkpassword.checkpassword import *
 from glams.glamsTemplate import glamsTemplate
 from glams.checkpassword.checkpassword import checkPassword
 import hashlib
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 from lxml import etree
 from lxml.builder import E
 
@@ -218,7 +218,7 @@ class Admin:
         
     @cherrypy.expose
     def adduser(self,fields):
-        d={urllib2.unquote(i.split('=')[0]):urllib2.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
+        d={urllib.parse.unquote(i.split('=')[0]):urllib.parse.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
         name=d['newusername']
         if name=='':
             return 'You must enter a username'
@@ -236,7 +236,7 @@ class Admin:
     def removeuser(self,fields):
         if checkPassword()!='admin':
             return "Only the admin can do this"
-        d={urllib2.unquote(i.split('=')[0]):urllib2.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
+        d={urllib.parse.unquote(i.split('=')[0]):urllib.parse.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
         if d['user']=='admin':
             return "You cannot delete the user 'admin'"
         nexperiments=db.execute("""SELECT COUNT(*) FROM lab_members INNER JOIN experiments AS mr ON lab_members.id=mr.lab_member_id WHERE lab_members.name=%s""",(d['user'],))[0][0]
@@ -250,7 +250,7 @@ class Admin:
     def addgene(self,fields):
         if checkPassword()!='admin':
             return "Only the admin can do this"
-        d={urllib2.unquote(i.split('=')[0]):urllib2.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
+        d={urllib.parse.unquote(i.split('=')[0]):urllib.parse.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
         if d['genedefaultstatus']=='+':
             d['genedefaultstatus']=True
         elif d['genedefaultstatus']=='-':
@@ -263,7 +263,7 @@ class Admin:
     def removegene(self,fields):
         if checkPassword()!='admin':
             return "Only the admin can do this"
-        d={urllib2.unquote(i.split('=')[0]):urllib2.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
+        d={urllib.parse.unquote(i.split('=')[0]):urllib.parse.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
         ntimesused=db.execute("""SELECT COUNT(*) FROM genetics LEFT JOIN genes ON genetics.gene_id=genes.id WHERE genes.name=%s""",(d['gene'],))[0][0]
         if ntimesused>0:
             return "Unable to remove '{0}' from the database because it is used {1} times.".format(d['gene'],ntimesused)
@@ -273,7 +273,7 @@ class Admin:
     def addstrain(self,fields):
         if checkPassword()!='admin':
             return "Only the admin can do this"
-        d={urllib2.unquote(i.split('=')[0]):urllib2.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
+        d={urllib.parse.unquote(i.split('=')[0]):urllib.parse.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
         if db.execute('SELECT COUNT(*) FROM strains WHERE name=%s',(d['strainname'],))[0][0]>0:
             return 'This strain has already been added to the database.'
         db.execute('INSERT INTO strains SET name=%s',(d['strainname'],))
@@ -283,7 +283,7 @@ class Admin:
         if checkPassword()!='admin':
             return "Only the admin can do this"
         try:
-            d={urllib2.unquote(i.split('=')[0]):urllib2.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
+            d={urllib.parse.unquote(i.split('=')[0]):urllib.parse.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
         except IndexError:
             return "Server Error.  The function removestrain() was passed variable '{0}'. Try refreshing the page.".format(fields)
         ntimesused=db.execute("""SELECT COUNT(*) FROM mice WHERE strain=%s""",(d['strain'],))[0][0]

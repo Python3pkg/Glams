@@ -1,6 +1,6 @@
 # encoding: utf-8
 if __name__ == 'users':
-    from connect import db
+    from .connect import db
 else:
     from .connect import db
 

@@ -6,7 +6,7 @@ Created on Mon Aug 26 15:52:22 2013
 """
 from glams.databaseInterface.connect import db, db2
 import mysql.connector.errors as mysqle
-import urllib2, datetime
+import urllib.request, urllib.error, urllib.parse, datetime
 import threading
 from lxml import etree
 from glams.website.database.forms import getResident
@@ -194,7 +194,7 @@ class Mouse:
             queries.append(["UPDATE housing SET cage_id=(SELECT id FROM cages WHERE name=%s), start_date=%s WHERE currentcage=1 AND mouse_id=(SELECT id FROM mice WHERE name=%s)",(d['cagename'],d['startDate'],d['mousename'])])
         
         d['oldcages']=[]
-        for cage in d.keys():
+        for cage in list(d.keys()):
             if cage.startswith('oldcagename'):
                 n=str(cage.split('oldcagename')[1])
                 if d['oldcagename'+n] is not None:
@@ -221,7 +221,7 @@ class Mouse:
         newex=[]
         dt=datetime.datetime.today()
         today=datetime.datetime(dt.year,dt.month,dt.day)
-        for reserve in d.keys():
+        for reserve in list(d.keys()):
             if reserve.startswith('reserve_lab_member'):
                 n=reserve.split('reserve_lab_member')[1]
                 if d['reserve_lab_member'+n] is not None:
@@ -255,7 +255,7 @@ class Mouse:
 
         ### GENETICS ###
         newgenes=[]
-        for gene in d.keys():
+        for gene in list(d.keys()):
             if gene.startswith('gene'):
                 n=gene.split('gene')[1]
                 if d['gene'+n] is not None:
@@ -323,7 +323,7 @@ class Mouse:
                 queries.append(["INSERT INTO housing SET mouse_id=(SELECT id FROM mice WHERE name=%s), cage_id=(SELECT id FROM cages WHERE name=%s), start_date=%s, currentcage=1",(d['mousename'],d['cagename'],d['startDate'])])
             else:
                 return "You must add an 'occupied' date for the current cage"
-        for cage in d.keys():
+        for cage in list(d.keys()):
             if cage.startswith('oldcagename'):
                 n=cage.split('oldcagename')[1]
                 if d['oldcagename'+n] is not None:
@@ -342,7 +342,7 @@ class Mouse:
         newex=[]
         dt=datetime.datetime.today()
         today=datetime.datetime(dt.year,dt.month,dt.day)
-        for reserve in d.keys():
+        for reserve in list(d.keys()):
             if reserve.startswith('reserve_lab_member'):
                 n=reserve.split('reserve_lab_member')[1]
                 if d['reserve_lab_member'+n] is not None:
@@ -368,7 +368,7 @@ class Mouse:
 
         ### GENETICS ###
         newgenes=[]
-        for gene in d.keys():
+        for gene in list(d.keys()):
             if gene.startswith('gene'):
                 n=gene.split('gene')[1]
                 if d['gene'+n] is not None:
@@ -441,8 +441,8 @@ class Cage:
         d_cages={}
         for col in set(getAllColumns('cages')) & set(d.keys()):
             d_cages[col]=d[col]
-        columns=', '.join(d_cages.keys())
-        parameters = ', '.join(['%({0})s'.format(k) for k in d_cages.keys()])
+        columns=', '.join(list(d_cages.keys()))
+        parameters = ', '.join(['%({0})s'.format(k) for k in list(d_cages.keys())])
         query = 'INSERT INTO cages ({0}) VALUES ({1})'.format(columns, parameters)
         db.execute(query,d)
         m_id=db.execute("SELECT id FROM cages where name=%s",(d['cagename'],))[0][0]
@@ -454,7 +454,7 @@ class Cage:
         
 if __name__=='__main__':
     data='name=testmouse&tag=pop&strain=C57BL/6&sex=female&life_status=alive&breeding_status=unknown&DOB=2013-08-26&DOD=2013-08-20&cause_of_death=flogging&notes=&mother=lalala&father=kite&reserve_lab_member=Ethan&reserve_date=2013-08-07&reserve_description=an experiment&genotyped=True&gene1=i-tdTomato&zygosity1= -&gene2=&zygosity2=&cagename=wt1&startDate=2013-08-26&oldcagename1=&startDate1=&endDate1='
-    data=urllib2.unquote(data.replace('+',' '))
+    data=urllib.parse.unquote(data.replace('+',' '))
     data2=[[b for b in c.split('=')] for c in data.split('&')] #list of lists
     m=Mouse()
     d={}

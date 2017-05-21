@@ -9,7 +9,7 @@ import os, cherrypy
 import time
 from lxml import etree
 from lxml.builder import E
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import mysql.connector
 
 
@@ -18,11 +18,11 @@ def setup_glams():
     ''' 1) check if config.txt is created.  If it isn't, display a webpage to create one.'''
     print('Setting up glams...')
     try:
-        from glams.databaseInterface.connect import importconfig
+        from .glams.databaseInterface.connect import importconfig
     except IOError:
         config={'database': 'glams', 'user': '', 'mysql_IP_address': 'localhost', 'calendarTag': '<div></div>', 'password': '', 'salt': '', 'port': '3306'}
         # config.txt doesn't exist.  This means we have to make it.
-        from glams.glamsTemplate import glamsTemplate
+        from .glams.glamsTemplate import glamsTemplate
         article=E.div(E.div({'id':'notification'},''),
                       E.h2('Configure GLAMS:'),
                       E.form(
@@ -104,7 +104,7 @@ class Ajax:
     @cherrypy.expose
     def config_glams(self,fields):
         reply=''
-        config={urllib2.unquote(i.split('=')[0]):urllib2.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
+        config={urllib.parse.unquote(i.split('=')[0]):urllib.parse.unquote(i.split('=')[1]) for i in [tmp for tmp in fields.split('&')]}
         if config['mysql_IP_address']=='':
             return 'You must enter an IP address'
         if config['port']=='':
@@ -139,7 +139,7 @@ class Ajax:
                                 password=str(config['password']), 
                                 port=int(config['port']))
                 cursor=cnx.cursor(buffered=True)
-                print(str(config['database']))
+                print((str(config['database'])))
                 try:
                     f=open('config.txt', 'w')
                 except IOError:
@@ -161,7 +161,7 @@ class Ajax:
                 cursor.close()
                 cnx.commit()
                 cnx.close()
-                from glams.databaseInterface.reset import reset
+                from .glams.databaseInterface.reset import reset
                 reset()
                 return "Successfully created GLAMS database. Please restart GLAMS by shutting it down and running it again. Then refresh this page. Login as 'admin' with password 'password'. "
             elif e.errno==2003: #Can't connect to mysql server.  Maybe an incorrect IP address?
@@ -192,18 +192,18 @@ def command_line_setup():
     if os.path.isfile('config.txt'):
         print("""\n\n****WARNING****\n\n DO NOT RUN THIS FILE IF YOU HAVE ALREADY ADDED INFORMATION TO THE DATABASE!!!\n\nTHIS FILE WILL RESET YOUR DATABASE.\n\nYou're trying to run setup.py but you already have a config file. You can edit the information in your config file in a text editor.  If you still want to run this file and reset your database, delete your 'config.txt' file.""")
     else:
-        mysql_IP_address=raw_input('Enter the ip address of your mysql server (leave blank if running on this computer): ')
+        mysql_IP_address=input('Enter the ip address of your mysql server (leave blank if running on this computer): ')
         if mysql_IP_address=='':
             mysql_IP_address='localhost'
-        database=raw_input('Enter the name of the MySQL database (e.g. glams): ')
+        database=input('Enter the name of the MySQL database (e.g. glams): ')
         if database=='':
             database='glams'
-        user=raw_input('Enter the name of the user you created to access the mysql database: ')
-        password=raw_input("Enter the password for user '{}':".format(user))
-        port=raw_input("Enter the port to access your mysql server (leave blank for the default '3306'): ")
+        user=input('Enter the name of the user you created to access the mysql database: ')
+        password=input("Enter the password for user '{}':".format(user))
+        port=input("Enter the port to access your mysql server (leave blank for the default '3306'): ")
         if port=='':
             port='3306'
-        salt=raw_input("Enter a 5-10 character random combination of characters to use as a salt for better password encryption: ")
+        salt=input("Enter a 5-10 character random combination of characters to use as a salt for better password encryption: ")
         
         config="""mysql_IP_address={0}
 user={1}
@@ -218,7 +218,7 @@ calendarTag=<p>No Calendar Yet</p>""".format(mysql_IP_address,user,database,pass
         f.close()
         print('Creating GLAMS database')
         time.sleep(2)
-        from glams.databaseInterface.reset import reset
+        from .glams.databaseInterface.reset import reset
         reset()
         print('Sucessfully created GLAMS database')
         

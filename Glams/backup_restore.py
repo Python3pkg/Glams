@@ -9,7 +9,7 @@ On Windows 7, you should be able to execute this file and back up your database.
 
 import os, datetime
 os.chdir(os.path.split(os.path.realpath(__file__))[0])
-from glams.databaseInterface.connect import importconfig
+from .glams.databaseInterface.connect import importconfig
 
 
 #### EDIT THESE PATHS IF THEIR LOCATION DIFFERS ON YOUR SYSTEM ####

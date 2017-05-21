@@ -23,7 +23,7 @@ def textinput(name,otherattributes={}):
     value=v[name]
     if value is None: value=''
     a={'type':'text','name':name,'value':value}
-    a=dict(a.items()+otherattributes.items())
+    a=dict(list(a.items())+list(otherattributes.items()))
     return E.input(a)
 def select(name,selectvalues=[], otherattributes={}):
     global v
@@ -43,21 +43,21 @@ def dateinput(name, otherattributes={}):
     value=v[name]
     if value is None: value=''
     a={'type':'date','name':name,'value':value}
-    a=dict(a.items()+otherattributes.items())
+    a=dict(list(a.items())+list(otherattributes.items()))
     return E.input(a)
 def textarea(name, otherattributes={}):
     global v
     value=v[name]
     if value is None: value=''
     a={'name':name}
-    a=dict(a.items()+otherattributes.items())
+    a=dict(list(a.items())+list(otherattributes.items()))
     return E.textarea(a,value)
 def numinput(name, otherattributes={}):
     global v
     value=v[name]
     if value is None: value=''
     a={'type':'number','step':'1','name':name}
-    a=dict(a.items()+otherattributes.items())
+    a=dict(list(a.items())+list(otherattributes.items()))
     return E.input(a)
 
 
@@ -103,7 +103,7 @@ def getMouseForm(oldval={}):
    'mother':'','father':'','reserve_lab_member1':'','reserve_date1':'','reserve_description1':'','reserve_filenames':'',
    'reserve_notes1':'','genotyped':'','gene1':'','zygosity1':'','cagename':'','startDate':'','oldcagename1':'','startDate1':'','endDate1':''}
    
-    v=dict(mousebasev.items()+oldval.items())
+    v=dict(list(mousebasev.items())+list(oldval.items()))
     if oldval=={}: #if this is a new mouse form
         header='Add Mouse'
         v['genes']=[['','']]
@@ -149,7 +149,7 @@ def getMouseForm(oldval={}):
         try:
             E.span(reserve_notes)
         except:
-            print("reserve_notes = {}".format(reserve_notes))
+            print(("reserve_notes = {}".format(reserve_notes)))
             #reserve_notes="".join([i for i in reserve_notes if ord(i) < 127])
         experimentfields.append(        
             E.div({'class':'reserveSelect'},
@@ -245,7 +245,7 @@ def getInnerCageForm(username, oldval={}, residents=[],litters=[],history=[]):
     cagebasev={'cagename':'','active':'','date_activated':date2str(datetime.datetime.now()),'date_inactivated':'',
            'location':'','expectingpl':'No','caretaker':username,'cagegroup':'','notes':''}
            
-    v=dict(cagebasev.items()+oldval.items())
+    v=dict(list(cagebasev.items())+list(oldval.items()))
     if oldval=={}: #if this is a new mouse form
         header='New Cage'
     else: #if we are editing an old mouse

@@ -63,7 +63,7 @@ db=DB()
 def convert_from_bytearray2(data):
     for i in range(len(data)):
         tmp=data[i]
-        for key in tmp.keys():
+        for key in list(tmp.keys()):
             if type(tmp[key])==bytearray:
                 tmp[key]=str(tmp[key])
     return data
